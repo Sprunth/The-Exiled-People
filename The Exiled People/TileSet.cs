@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SFML.Graphics;
+using SFML.Window;
+
+namespace The_Exiled_People
+{
+    /// <summary>
+    /// Contains all the data for a particular texture map
+    /// </summary>
+    class TileSet
+    {
+        public Texture Tex { get; private set; }
+        public Vector2u TileSize { get; private set; }
+
+        public TileSet(string texPath, Vector2u tileSize)
+        {
+            Tex = new Texture(texPath);
+            TileSize = tileSize;
+        }
+    }
+}
