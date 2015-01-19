@@ -15,14 +15,23 @@ namespace The_Exiled_People
         private VertexArray _vertices;
         private Vector2u _layerSize;
 
-        private TileSet _texture;
+        private TileSet _tileSet;
+        public TileSet Tileset
+        {
+            get { return _tileSet; }
+            set
+            {
+                _tileSet = value;
+                SetupVertexArray();
+            }
+        }
 
-        public MapLayer(Vector2u layerSize)
+        public MapLayer(Vector2u layerSize, TileSet initalTileSet)
         {
             _layerSize = layerSize;
             _layer = new MapSpot[layerSize.X, layerSize.Y];
-            
-            _texture = new TileSet(@"testTileSet.png", new Vector2u(12,12));
+
+            Tileset = initalTileSet;
 
             SetupVertexArray();
         }
@@ -34,7 +43,7 @@ namespace The_Exiled_People
             //_vertices.Resize(_layerSize.X * _layerSize.Y * 4);
 
             
-            var tilesize = _texture.TileSize;
+            var tilesize = Tileset.TileSize;
 
             for (var row = 0; row < _layerSize.X; row++)
             {
@@ -71,12 +80,12 @@ namespace The_Exiled_People
                 for (uint row = 0; row < _layerSize.Y; row++)
                 {
                     var tc1 = new Vector2f(
-                        rand.Next((int)Math.Round(((double)_texture.Tex.Size.X/_texture.TileSize.X) - 1)) * _texture.TileSize.X,
-                        rand.Next((int)Math.Round(((double)_texture.Tex.Size.X/_texture.TileSize.X) - 1)) * _texture.TileSize.Y
+                        rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.X,
+                        rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.Y
                         );
-                    var tc2 = tc1 + new Vector2f(_texture.TileSize.X, 0);
-                    var tc3 = tc1 + new Vector2f(_texture.TileSize.X, _texture.TileSize.Y);
-                    var tc4 = tc1 + new Vector2f(0, _texture.TileSize.Y);
+                    var tc2 = tc1 + new Vector2f(Tileset.TileSize.X, 0);
+                    var tc3 = tc1 + new Vector2f(Tileset.TileSize.X, Tileset.TileSize.Y);
+                    var tc4 = tc1 + new Vector2f(0, Tileset.TileSize.Y);
 
                     //tc1 = new Vector2f(0, 0);
                     //tc2 = new Vector2f(100, 0);
@@ -102,12 +111,12 @@ namespace The_Exiled_People
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
         {
-            target.Draw(_vertices, new RenderStates(_texture.Tex));
+            target.Draw(_vertices, new RenderStates(Tileset.Tex));
         }
 
         public void Update()
         {
-            UpdateTexCoords();
+            
         }
 
         void IDisposable.Dispose()

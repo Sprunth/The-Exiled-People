@@ -12,7 +12,7 @@ namespace The_Exiled_People
 {
     class TepGame : IDisposable
     {
-        private readonly RenderWindow _window;
+        public RenderWindow Win { get; private set; }
         private Vector2u screensize;
 
         private readonly RenderTexture _target;
@@ -31,33 +31,28 @@ namespace The_Exiled_People
                 MajorVersion = 0,
                 MinorVersion = 1
             };
-            _window = new RenderWindow(new VideoMode(screensize.X, screensize.Y), "The Exiled People", Styles.Close, cs);
-            _window.SetFramerateLimit(60);
-            _window.SetVerticalSyncEnabled(true);
+            Win = new RenderWindow(new VideoMode(screensize.X, screensize.Y), "The Exiled People", Styles.Close, cs);
+            Win.SetFramerateLimit(60);
+            Win.SetVerticalSyncEnabled(true);
 
-            _window.Closed += _window_Closed;
+            Win.Closed += WinClosed;
+            Win.KeyReleased += Win_KeyReleased;
 
             _target = new RenderTexture(screensize.X, screensize.Y) { Smooth = true };
             _targetSpr = new Sprite();
 
-            _map = new Map(new Vector2u(90, 90));
-        }
-
-        void _window_Closed(object sender, EventArgs e)
-        {
-            if (sender.GetType() == typeof(RenderWindow))
-                ((RenderWindow)sender).Close();
+            _map = new Map(new Vector2u(90, 90), new Vector2u(600,600));
         }
 
         public void Initialize()
         {
-            
+            _map.Initialize();
         }
 
         public void Run()
         {
             var lastFPS = 0;
-            while (_window.IsOpen())
+            while (Win.IsOpen())
             {
                 var frameStart = DateTime.Now;
 
@@ -67,16 +62,14 @@ namespace The_Exiled_People
                 // Not super accurate, espcially if frame is working too fast
                 var fps = (int)Math.Round(1 / (DateTime.Now - frameStart).TotalSeconds);
                 if (fps == lastFPS) { continue; }
-                _window.SetTitle(string.Format("The Exiled People | FPS: {0}", fps));
+                Win.SetTitle(string.Format("The Exiled People | FPS: {0}", fps));
                 lastFPS = fps;
             }
         }
 
         void Update()
         {
-            _window.DispatchEvents();
-            if (DateTime.Now.Millisecond % 10 == 0)
-                _map.Update();
+            Win.DispatchEvents();
         }
 
         void Draw()
@@ -86,15 +79,28 @@ namespace The_Exiled_People
             _target.Display();
             _targetSpr.Texture = _target.Texture;
 
-            _window.Clear();
-            _window.Draw(_targetSpr);
-            _window.Display();
+            Win.Clear();
+            Win.Draw(_targetSpr);
+            Win.Display();
+        }
+
+        void Win_KeyReleased(object sender, KeyEventArgs e)
+        {
+            if (e.Code == Keyboard.Key.Escape)
+                Win.Close();
+        }
+
+        void WinClosed(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(RenderWindow))
+                ((RenderWindow)sender).Close();
         }
 
         void IDisposable.Dispose()
         {
+            _map.Dispose();
             _targetSpr.Dispose();
-            _window.Dispose();
+            Win.Dispose();
         }
     }
 }
