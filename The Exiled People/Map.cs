@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace The_Exiled_People
             _layerSize = layerSize;
 
             _target = new RenderTexture(displaySize.X, displaySize.Y) {Smooth = true};
-            _targetSpr = new Sprite() {Position = new Vector2f(0,60)};
+            _targetSpr = new Sprite() {Position = new Vector2f(0,20)};
 
             _tileSetTexture = new TileSet(@"testTileSet.png", new Vector2u(12, 12));
 
@@ -112,7 +113,10 @@ namespace The_Exiled_People
                 return;
 
             var coords = _target.MapPixelToCoords(new Vector2i(e.X - (int)_targetSpr.Position.X, e.Y - (int)_targetSpr.Position.Y));
-            Debug.WriteLine("{0}, {1}", Math.Floor(coords.X / _tileSetTexture.TileSize.X), Math.Floor(coords.Y / _tileSetTexture.TileSize.Y));
+            var mapCoords = new Vector2u((uint)Math.Floor(coords.X/_tileSetTexture.TileSize.X),
+                (uint)Math.Floor(coords.Y/_tileSetTexture.TileSize.Y));
+            Debug.WriteLine("clicked on {0} | {1}", mapCoords, _entireMap[_activeLayer].GetSpotAt(mapCoords.X, mapCoords.Y));
+            
         }
 
         void Win_KeyReleased(object sender, KeyEventArgs e)

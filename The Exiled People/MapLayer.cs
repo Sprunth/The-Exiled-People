@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SFML.Graphics;
 using SFML.Window;
+using The_Exiled_People.TileContents;
 
 namespace The_Exiled_People
 {
     class MapLayer : Drawable , IUpdateable , IDisposable
     {
-        private MapSpot[,] _layer;
+        private readonly MapSpot[,] _layer;
         private VertexArray _vertices;
         private Vector2u _layerSize;
 
@@ -33,13 +34,22 @@ namespace The_Exiled_People
 
             Tileset = initalTileSet;
 
+            _layer = new MapSpot[_layerSize.X, _layerSize.Y];
+            for (var row = 0; row < _layerSize.Y; row++)
+            {
+                for (var col = 0; col < _layerSize.X; col++)
+                {
+                    _layer[row, col] = new MapSpot(FloorType.Dirt);
+                }
+            }
+
             SetupVertexArray();
         }
 
         void SetupVertexArray()
         {
             _vertices = new VertexArray(PrimitiveType.Quads);
-            // Faster, but too lazy to math
+            // Faster if we resize, but too lazy to math
             //_vertices.Resize(_layerSize.X * _layerSize.Y * 4);
 
             
@@ -87,17 +97,12 @@ namespace The_Exiled_People
                     var tc3 = tc1 + new Vector2f(Tileset.TileSize.X, Tileset.TileSize.Y);
                     var tc4 = tc1 + new Vector2f(0, Tileset.TileSize.Y);
 
-                    //tc1 = new Vector2f(0, 0);
-                    //tc2 = new Vector2f(100, 0);
-                    //tc3 = new Vector2f(100, 100);
-                    //tc4 = new Vector2f(0, 100);
+                    //tc1 = new Vector2f(0, 12);
+                    //tc2 = new Vector2f(12, 0);
+                    //tc3 = new Vector2f(12, 12);
+                    //tc4 = new Vector2f(0, 12);
 
                     //Debug.WriteLine("{0} {1} {2} {3}", tc1, tc2, tc3, tc4);
-
-                    //_vertices[row * _layerSize.X + col * 4 + 0] = new Vertex() { Position = _vertices[row * _layerSize.X + col * 4 + 0].Position, TexCoords = tc1, Color = Color.Blue };
-                    //_vertices[row * _layerSize.X + col * 4 + 1] = new Vertex() { Position = _vertices[row * _layerSize.X + col * 4 + 1].Position, TexCoords = tc2, Color = Color.Green };
-                    //_vertices[row * _layerSize.X + col * 4 + 2] = new Vertex() { Position = _vertices[row * _layerSize.X + col * 4 + 2].Position, TexCoords = tc3, Color = Color.Red };
-                    //_vertices[row * _layerSize.X + col * 4 + 3] = new Vertex() { Position = _vertices[row * _layerSize.X + col * 4 + 3].Position, TexCoords = tc4, Color = Color.Yellow };
 
                     var index = (_layerSize.X*row + col)*4;
 
@@ -107,6 +112,11 @@ namespace The_Exiled_People
                     _vertices[index + 3] = new Vertex(_vertices[index + 3].Position){ TexCoords = tc4 };
                 }
             }
+        }
+
+        public MapSpot GetSpotAt(uint x, uint y)
+        {
+            return _layer[x, y];
         }
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
