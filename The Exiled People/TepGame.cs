@@ -20,9 +20,11 @@ namespace The_Exiled_People
 
         private readonly Map _map;
 
+        public Random Rand { get; private set; }
+
         public TepGame()
         {
-            screensize = new Vector2u(1100, 1100);
+            screensize = new Vector2u(1100, 900);
             var cs = new ContextSettings()
             {
                 DepthBits = 24,
@@ -37,6 +39,8 @@ namespace The_Exiled_People
 
             Win.Closed += WinClosed;
             Win.KeyReleased += Win_KeyReleased;
+
+            Rand = new Random();
 
             _target = new RenderTexture(screensize.X, screensize.Y) { Smooth = true };
             _targetSpr = new Sprite();

@@ -36,11 +36,12 @@ namespace The_Exiled_People
             _tileSetTexture = new TileSet(@"testTileSet.png", new Vector2u(12, 12));
 
             _entireMap = new List<MapLayer>();
-            AddNewLayer(); // Add inital layer
+            
         }
 
         public void Initialize()
         {
+            AddNewLayer(); // Add inital layer
             Program.ActiveGame.Win.MouseButtonReleased += Win_MouseButtonReleased;
             Program.ActiveGame.Win.KeyReleased += Win_KeyReleased;
         }
@@ -51,8 +52,13 @@ namespace The_Exiled_People
             _entireMap.ForEach(layer => layer.Tileset = ts);
         }
 
-        private void MoveLayer(bool down)
+        /// <summary>
+        /// Move up or down a layer
+        /// </summary>
+        /// <param name="down"></param>
+        private void MoveUpDownLayer(bool down)
         {
+            var oldTopLeft = _entireMap[_activeLayer].TopLeft;
             if (down)
             {
                 if (_activeLayer == _entireMap.Count-1)
@@ -64,6 +70,8 @@ namespace The_Exiled_People
                 if (_activeLayer != 0)
                     _activeLayer--;
             }
+            //Todo: there's a redundant redraw here from addnewlayer and assigning topleft
+            _entireMap[_activeLayer].TopLeft = oldTopLeft;
             Debug.WriteLine("Moved to layer {0}", _activeLayer);
         }
 
@@ -124,12 +132,44 @@ namespace The_Exiled_People
             switch (e.Code)
             {
                 case Keyboard.Key.Q:
-                    MoveLayer(false);
+                    MoveUpDownLayer(false);
                     break;
                 case Keyboard.Key.E:
-                    MoveLayer(true);
+                    MoveUpDownLayer(true);
+                    break;
+                case Keyboard.Key.Left:
+                case Keyboard.Key.Right:
+                case Keyboard.Key.Up:
+                case Keyboard.Key.Down:
+                    MoveMap(e.Code);
                     break;
             }
+        }
+
+        void MoveMap(Keyboard.Key key)
+        {
+            var move = new Vector2i(0, 0);
+            switch (key)
+            {
+                case Keyboard.Key.Left:
+                    if (_entireMap[_activeLayer].TopLeft.X > 0)
+                        move.X -= 1;
+                    break;
+                case Keyboard.Key.Right:
+                    if (_entireMap[_activeLayer].TopLeft.X + _target.Size.X < _entireMap[_activeLayer].LayerSize.X)
+                        move.X += 1;
+                    break;
+                case Keyboard.Key.Up:
+                    if (_entireMap[_activeLayer].TopLeft.Y > 0)
+                        move.Y -= 1;
+                    break;
+                case Keyboard.Key.Down:
+                    if (_entireMap[_activeLayer].TopLeft.Y + _target.Size.Y < _entireMap[_activeLayer].LayerSize.Y)
+                        move.Y += 1;
+                    break;
+
+            }
+            _entireMap[_activeLayer].TopLeft += move;
         }
 
         public void Dispose()

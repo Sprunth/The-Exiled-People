@@ -15,6 +15,7 @@ namespace The_Exiled_People
         private readonly MapSpot[,] _layer;
         private VertexArray _vertices;
         private Vector2u _layerSize;
+        public Vector2u LayerSize { get { return _layerSize; } set { _layerSize = value; } }
 
         private TileSet _tileSet;
         public TileSet Tileset
@@ -25,6 +26,13 @@ namespace The_Exiled_People
                 _tileSet = value;
                 SetupVertexArray();
             }
+        }
+
+        private Vector2i _topLeft;
+        public Vector2i TopLeft
+        {
+            get { return _topLeft; }
+            set { _topLeft = value; SetupVertexArray(); }
         }
 
         public MapLayer(Vector2u layerSize, TileSet initalTileSet)
@@ -42,6 +50,8 @@ namespace The_Exiled_People
                     _layer[row, col] = new MapSpot(FloorType.Dirt);
                 }
             }
+
+            TopLeft = new Vector2i(0, 0);
 
             SetupVertexArray();
         }
@@ -82,9 +92,8 @@ namespace The_Exiled_People
         /// </summary>
         void UpdateTexCoords()
         {
+            var rand = Program.ActiveGame.Rand;
             // placeholder until tiles have real data
-            var rand = new Random();
-
             for (uint col = 0; col < _layerSize.X; col++)
             {
                 for (uint row = 0; row < _layerSize.Y; row++)
