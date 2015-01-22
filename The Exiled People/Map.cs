@@ -26,6 +26,8 @@ namespace The_Exiled_People
 
         private TileSetCollection _tileSetCollection;
 
+        private bool zoomed = false;
+
         public Map(Vector2u layerSize, Vector2u displaySize)
         {
             _layerSize = layerSize;
@@ -131,6 +133,11 @@ namespace The_Exiled_People
                 (uint)Math.Floor(coords.Y/_tileSetCollection.TileSize.Y));
             mapCoords.X += (uint)_entireMap[_activeLayer].TopLeft.X;
             mapCoords.Y += (uint)_entireMap[_activeLayer].TopLeft.Y;
+            if (zoomed)
+            {
+                mapCoords.X *= 2;
+                mapCoords.Y *= 2;
+            }
             Debug.WriteLine("clicked on {0} | {1}", mapCoords, _entireMap[_activeLayer].GetSpotAt(mapCoords.X, mapCoords.Y));
         }
 
@@ -143,6 +150,24 @@ namespace The_Exiled_People
                     break;
                 case Keyboard.Key.E:
                     MoveUpDownLayer(true);
+                    break;
+                case Keyboard.Key.Equal: // plus
+                    if (!zoomed)
+                    {
+                        zoomed = true;
+                        var v =_target.GetView();
+                        v.Zoom(0.5f);
+                        _target.SetView(v);
+                    }
+                    break;
+                case Keyboard.Key.Dash: // minus
+                    if (zoomed)
+                    {
+                        zoomed = false;
+                        var v = _target.GetView();
+                        v.Zoom(2f);
+                        _target.SetView(v);
+                    }
                     break;
             }
         }
