@@ -13,7 +13,7 @@ namespace The_Exiled_People
     class MapLayer : Drawable , IUpdateable , IDisposable
     {
         private readonly MapSpot[,] _layer;
-        private VertexArray _floorVertices;
+        private VertexArray _floorVertices, _peopleVertices;
         private Tuple<Vector2f, Vector2f, Vector2f, Vector2f>[,] _gridPositions;
 
         private Vector2u _layerSize;
@@ -47,13 +47,15 @@ namespace The_Exiled_People
 
             _layer = new MapSpot[_layerSize.X, _layerSize.Y];
             var floorTypes = Enum.GetValues(typeof (FloorType));
+            var professions = Enum.GetValues(typeof (PersonProfession));
             for (var row = 0; row < _layerSize.Y; row++)
             {
                 for (var col = 0; col < _layerSize.X; col++)
                 {
-                    _layer[row, col] = new MapSpot(
-                        (FloorType)floorTypes.GetValue(Program.ActiveGame.Rand.Next(floorTypes.Length))
-                        );
+                    var floor = (FloorType) floorTypes.GetValue(Program.ActiveGame.Rand.Next(floorTypes.Length));
+                    var profession = Program.ActiveGame.Rand.Next(20) == 1 ? (PersonProfession)professions.GetValue(Program.ActiveGame.Rand.Next(professions.Length)) : PersonProfession.None;
+                    
+                    _layer[row, col] = new MapSpot(floor, profession);
                 }
             }
 
@@ -96,27 +98,38 @@ namespace The_Exiled_People
         void UpdateTexCoords()
         {
             _floorVertices = new VertexArray(PrimitiveType.Quads);
+            _peopleVertices = new VertexArray(PrimitiveType.Quads);
             _floorVertices.Resize((uint)_gridPositions.Length * 4);
+            _peopleVertices.Resize((uint)_gridPositions.Length * 4);
 
             for (var col = (uint)0; col < DrawTargetSize.X / TileSetCollection.TileSize.X; col++)
             {
                 for (var row = (uint)0; row < DrawTargetSize.Y/TileSetCollection.TileSize.Y; row++)
                 {
+                    var index = (_layerSize.X * (row) + (col)) * 4;
+                    var mapSpot = _layer[col + TopLeft.X, row + TopLeft.Y];
 
-                    var tup = TileSetCollection.GetTexCoordOf(_layer[col + TopLeft.X, row + TopLeft.Y].FloorType);
-                    var tc1 = tup.Item1;
-                    var tc2 = tup.Item2;
-                    var tc3 = tup.Item3;
-                    var tc4 = tup.Item4;
+                    var floorTup = TileSetCollection.GetTexCoordOf(mapSpot.FloorType);
+                    var fc1 = floorTup.Item1;
+                    var fc2 = floorTup.Item2;
+                    var fc3 = floorTup.Item3;
+                    var fc4 = floorTup.Item4;
+                    
+                    _floorVertices[index + 0] = new Vertex(_gridPositions[col, row].Item1) { TexCoords = fc1 };
+                    _floorVertices[index + 1] = new Vertex(_gridPositions[col, row].Item2) { TexCoords = fc2 };
+                    _floorVertices[index + 2] = new Vertex(_gridPositions[col, row].Item3) { TexCoords = fc3 };
+                    _floorVertices[index + 3] = new Vertex(_gridPositions[col, row].Item4) { TexCoords = fc4 };
 
-                    //Debug.WriteLine("{0} {1} {2} {3}", tc1, tc2, tc3, tc4);
 
-                    var index = (_layerSize.X*(row) + (col))*4;
-
-                    _floorVertices[index + 0] = new Vertex(_gridPositions[col, row].Item1) { TexCoords = tc1 };
-                    _floorVertices[index + 1] = new Vertex(_gridPositions[col, row].Item2) { TexCoords = tc2 };
-                    _floorVertices[index + 2] = new Vertex(_gridPositions[col, row].Item3) { TexCoords = tc3 };
-                    _floorVertices[index + 3] = new Vertex(_gridPositions[col, row].Item4) { TexCoords = tc4 };
+                    var personTup = TileSetCollection.GetTexCoordOf(mapSpot.PersonProfession);
+                    var pc1 = personTup.Item1;
+                    var pc2 = personTup.Item2;
+                    var pc3 = personTup.Item3;
+                    var pc4 = personTup.Item4;
+                    _peopleVertices[index + 0] = new Vertex(_gridPositions[col, row].Item1) { TexCoords = pc1 };
+                    _peopleVertices[index + 1] = new Vertex(_gridPositions[col, row].Item2) { TexCoords = pc2 };
+                    _peopleVertices[index + 2] = new Vertex(_gridPositions[col, row].Item3) { TexCoords = pc3 };
+                    _peopleVertices[index + 3] = new Vertex(_gridPositions[col, row].Item4) { TexCoords = pc4 };
                 }
             }
         }
@@ -129,6 +142,7 @@ namespace The_Exiled_People
         void Drawable.Draw(RenderTarget target, RenderStates states)
         {
             target.Draw(_floorVertices, new RenderStates(TileSetCollection.Floor.Tex));
+            target.Draw(_peopleVertices, new RenderStates(TileSetCollection.People.Tex));
         }
 
         public void Update()
