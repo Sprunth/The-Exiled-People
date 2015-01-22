@@ -24,7 +24,7 @@ namespace The_Exiled_People
         private readonly RenderTexture _target;
         private readonly Sprite _targetSpr;
 
-        private TileSet _floorTileSet, _peopleTileSet;
+        private TileSetCollection _tileSetCollection;
 
         public Map(Vector2u layerSize, Vector2u displaySize)
         {
@@ -33,8 +33,7 @@ namespace The_Exiled_People
             _target = new RenderTexture(displaySize.X, displaySize.Y) {Smooth = true};
             _targetSpr = new Sprite() {Position = new Vector2f(12, 24)};
 
-            _floorTileSet = new TileSet(@"Graphics/Floor.png", new Vector2u(16, 16));
-            _peopleTileSet = new TileSet(@"Graphics/People.png", new Vector2u(16, 16));
+            _tileSetCollection = new TileSetCollection();
 
             _entireMap = new List<MapLayer>();
             
@@ -48,10 +47,10 @@ namespace The_Exiled_People
             Program.ActiveGame.Win.KeyPressed += Win_KeyPressed;
         }
 
-        public void ChangeTileSet(TileSet ts)
+        public void ChangeTileSet(TileSetCollection tsc)
         {
-            _floorTileSet = ts;
-            _entireMap.ForEach(layer => layer.FloorTileSet = ts);
+            _tileSetCollection = tsc;
+            _entireMap.ForEach(layer => layer.TileSetCollection = tsc);
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace The_Exiled_People
         private void AddNewLayer(bool downward = true)
         {
             Debug.WriteLine("Added new Layer");
-            var toInsert = new MapLayer(_layerSize, _floorTileSet, _target.Size);
+            var toInsert = new MapLayer(_layerSize, _tileSetCollection, _target.Size);
             if (downward)
             {
                 _entireMap.Add(toInsert);
@@ -128,8 +127,8 @@ namespace The_Exiled_People
                 return;
 
             var coords = _target.MapPixelToCoords(new Vector2i(e.X - (int)_targetSpr.Position.X, e.Y - (int)_targetSpr.Position.Y));
-            var mapCoords = new Vector2u((uint)Math.Floor(coords.X/_floorTileSet.TileSize.X),
-                (uint)Math.Floor(coords.Y/_floorTileSet.TileSize.Y));
+            var mapCoords = new Vector2u((uint)Math.Floor(coords.X/_tileSetCollection.TileSize.X),
+                (uint)Math.Floor(coords.Y/_tileSetCollection.TileSize.Y));
             mapCoords.X += (uint)_entireMap[_activeLayer].TopLeft.X;
             mapCoords.Y += (uint)_entireMap[_activeLayer].TopLeft.Y;
             Debug.WriteLine("clicked on {0} | {1}", mapCoords, _entireMap[_activeLayer].GetSpotAt(mapCoords.X, mapCoords.Y));
@@ -171,7 +170,7 @@ namespace The_Exiled_People
                         move.X -= 1;
                     break;
                 case Keyboard.Key.Right:
-                    if (_entireMap[_activeLayer].TopLeft.X + _target.Size.X/_floorTileSet.TileSize.X < _entireMap[_activeLayer].LayerSize.X)
+                    if (_entireMap[_activeLayer].TopLeft.X + _target.Size.X/_tileSetCollection.TileSize.X < _entireMap[_activeLayer].LayerSize.X)
                         move.X += 1;
                     break;
                 case Keyboard.Key.Up:
@@ -179,7 +178,7 @@ namespace The_Exiled_People
                         move.Y -= 1;
                     break;
                 case Keyboard.Key.Down:
-                    if (_entireMap[_activeLayer].TopLeft.Y + _target.Size.Y/_floorTileSet.TileSize.Y < _entireMap[_activeLayer].LayerSize.Y)
+                    if (_entireMap[_activeLayer].TopLeft.Y + _target.Size.Y/_tileSetCollection.TileSize.Y < _entireMap[_activeLayer].LayerSize.Y)
                         move.Y += 1;
                     break;
 

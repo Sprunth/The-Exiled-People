@@ -79,6 +79,7 @@
     <Compile Include="TepGame.cs" />
     <Compile Include="TileContents\Floor.cs" />
     <Compile Include="TileSet.cs" />
+    <Compile Include="TileSetCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
