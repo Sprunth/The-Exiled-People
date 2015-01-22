@@ -33,7 +33,7 @@ namespace The_Exiled_People
             _target = new RenderTexture(displaySize.X, displaySize.Y) {Smooth = true};
             _targetSpr = new Sprite() {Position = new Vector2f(0,20)};
 
-            _tileSetTexture = new TileSet(@"testTileSet.png", new Vector2u(12, 12));
+            _tileSetTexture = new TileSet(@"Graphics/Floor.png", new Vector2u(16, 16));
 
             _entireMap = new List<MapLayer>();
             
@@ -82,7 +82,7 @@ namespace The_Exiled_People
         private void AddNewLayer(bool downward = true)
         {
             Debug.WriteLine("Added new Layer");
-            var toInsert = new MapLayer(_layerSize, _tileSetTexture);
+            var toInsert = new MapLayer(_layerSize, _tileSetTexture, _target.Size);
             if (downward)
             {
                 _entireMap.Add(toInsert);
@@ -93,7 +93,12 @@ namespace The_Exiled_People
                 _entireMap.Insert(0, toInsert);
                 _activeLayer++;
             }
-                
+        }
+
+        public void ResizeTarget(Vector2u newSize)
+        {
+            _entireMap.ForEach(layer => layer.DrawTargetSize = newSize);
+            throw new NotImplementedException();
         }
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
@@ -123,8 +128,9 @@ namespace The_Exiled_People
             var coords = _target.MapPixelToCoords(new Vector2i(e.X - (int)_targetSpr.Position.X, e.Y - (int)_targetSpr.Position.Y));
             var mapCoords = new Vector2u((uint)Math.Floor(coords.X/_tileSetTexture.TileSize.X),
                 (uint)Math.Floor(coords.Y/_tileSetTexture.TileSize.Y));
+            mapCoords.X += (uint)_entireMap[_activeLayer].TopLeft.X;
+            mapCoords.Y += (uint)_entireMap[_activeLayer].TopLeft.Y;
             Debug.WriteLine("clicked on {0} | {1}", mapCoords, _entireMap[_activeLayer].GetSpotAt(mapCoords.X, mapCoords.Y));
-            
         }
 
         void Win_KeyReleased(object sender, KeyEventArgs e)
@@ -156,7 +162,7 @@ namespace The_Exiled_People
                         move.X -= 1;
                     break;
                 case Keyboard.Key.Right:
-                    if (_entireMap[_activeLayer].TopLeft.X + _target.Size.X < _entireMap[_activeLayer].LayerSize.X)
+                    if (_entireMap[_activeLayer].TopLeft.X + _target.Size.X/_tileSetTexture.TileSize.X < _entireMap[_activeLayer].LayerSize.X)
                         move.X += 1;
                     break;
                 case Keyboard.Key.Up:
@@ -164,7 +170,7 @@ namespace The_Exiled_People
                         move.Y -= 1;
                     break;
                 case Keyboard.Key.Down:
-                    if (_entireMap[_activeLayer].TopLeft.Y + _target.Size.Y < _entireMap[_activeLayer].LayerSize.Y)
+                    if (_entireMap[_activeLayer].TopLeft.Y + _target.Size.Y/_tileSetTexture.TileSize.Y < _entireMap[_activeLayer].LayerSize.Y)
                         move.Y += 1;
                     break;
 

@@ -45,7 +45,7 @@ namespace The_Exiled_People
             _target = new RenderTexture(screensize.X, screensize.Y) { Smooth = true };
             _targetSpr = new Sprite();
 
-            _map = new Map(new Vector2u(90, 90), new Vector2u(600,600));
+            _map = new Map(new Vector2u(90, 90), new Vector2u(960, 480));
         }
 
         public void Initialize()

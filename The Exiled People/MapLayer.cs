@@ -17,6 +17,8 @@ namespace The_Exiled_People
         private Vector2u _layerSize;
         public Vector2u LayerSize { get { return _layerSize; } set { _layerSize = value; } }
 
+        public Vector2u DrawTargetSize { get; set; }
+
         private TileSet _tileSet;
         public TileSet Tileset
         {
@@ -32,26 +34,27 @@ namespace The_Exiled_People
         public Vector2i TopLeft
         {
             get { return _topLeft; }
-            set { _topLeft = value; SetupVertexArray(); }
+            set { _topLeft = value; Debug.WriteLine("TopLeft now at {0}", _topLeft); SetupVertexArray(); }
         }
 
-        public MapLayer(Vector2u layerSize, TileSet initalTileSet)
+        public MapLayer(Vector2u layerSize, TileSet initalTileSet, Vector2u initalDrawTargetSize)
         {
             _layerSize = layerSize;
-            _layer = new MapSpot[layerSize.X, layerSize.Y];
-
-            Tileset = initalTileSet;
+            DrawTargetSize = initalDrawTargetSize;
 
             _layer = new MapSpot[_layerSize.X, _layerSize.Y];
+            var floorTypes = Enum.GetValues(typeof (FloorType));
             for (var row = 0; row < _layerSize.Y; row++)
             {
                 for (var col = 0; col < _layerSize.X; col++)
                 {
-                    _layer[row, col] = new MapSpot(FloorType.Dirt);
+                    _layer[row, col] = new MapSpot((FloorType)floorTypes.GetValue(Program.ActiveGame.Rand.Next(floorTypes.Length)));
                 }
             }
 
-            TopLeft = new Vector2i(0, 0);
+            Tileset = initalTileSet;
+
+            _topLeft = new Vector2i(0, 0);
 
             SetupVertexArray();
         }
@@ -69,10 +72,10 @@ namespace The_Exiled_People
             {
                 for (var col = 0; col < _layerSize.Y; col++)
                 {
-                    var v1 = new Vertex(new Vector2f(row        * tilesize.X, col       * tilesize.Y));
-                    var v2 = new Vertex(new Vector2f((row + 1)  * tilesize.X, col       * tilesize.Y));
-                    var v3 = new Vertex(new Vector2f((row + 1)  * tilesize.X, (col + 1) * tilesize.Y));
-                    var v4 = new Vertex(new Vector2f(row        * tilesize.X, (col + 1) * tilesize.Y));
+                    var v1 = new Vertex(new Vector2f((col )      * tilesize.X, (row )      * tilesize.Y));
+                    var v2 = new Vertex(new Vector2f((col + 1 )  * tilesize.X, (row )      * tilesize.Y));
+                    var v3 = new Vertex(new Vector2f((col + 1 )  * tilesize.X, (row + 1 )  * tilesize.Y));
+                    var v4 = new Vertex(new Vector2f((col )      * tilesize.X, (row + 1 )  * tilesize.Y));
                    
 
                     _vertices.Append(v1);
@@ -92,12 +95,12 @@ namespace The_Exiled_People
         /// </summary>
         void UpdateTexCoords()
         {
-            var rand = Program.ActiveGame.Rand;
-            // placeholder until tiles have real data
-            for (uint col = 0; col < _layerSize.X; col++)
+            //for (var col = (uint)TopLeft.Y; col < DrawTargetSize.X/Tileset.TileSize.X; col++)
+            for (var col = (uint)0; col < DrawTargetSize.X / Tileset.TileSize.X; col++)
             {
-                for (uint row = 0; row < _layerSize.Y; row++)
+                for (var row = (uint)0; row < DrawTargetSize.Y/Tileset.TileSize.Y; row++)
                 {
+                    /*
                     var tc1 = new Vector2f(
                         rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.X,
                         rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.Y
@@ -105,6 +108,13 @@ namespace The_Exiled_People
                     var tc2 = tc1 + new Vector2f(Tileset.TileSize.X, 0);
                     var tc3 = tc1 + new Vector2f(Tileset.TileSize.X, Tileset.TileSize.Y);
                     var tc4 = tc1 + new Vector2f(0, Tileset.TileSize.Y);
+                    */
+
+                    var tup = Tileset.GetTexCoordOf(_layer[row + TopLeft.X, col + TopLeft.Y].FloorType);
+                    var tc1 = tup.Item1;
+                    var tc2 = tup.Item2;
+                    var tc3 = tup.Item3;
+                    var tc4 = tup.Item4;
 
                     //tc1 = new Vector2f(0, 12);
                     //tc2 = new Vector2f(12, 0);
@@ -113,7 +123,7 @@ namespace The_Exiled_People
 
                     //Debug.WriteLine("{0} {1} {2} {3}", tc1, tc2, tc3, tc4);
 
-                    var index = (_layerSize.X*row + col)*4;
+                    var index = (uint)(_layerSize.X*(row) + (col))*4;
 
                     _vertices[index + 0] = new Vertex(_vertices[index + 0].Position){ TexCoords = tc1 };
                     _vertices[index + 1] = new Vertex(_vertices[index + 1].Position){ TexCoords = tc2 };
@@ -125,7 +135,7 @@ namespace The_Exiled_People
 
         public MapSpot GetSpotAt(uint x, uint y)
         {
-            return _layer[x, y];
+            return _layer[y, x];
         }
 
         void Drawable.Draw(RenderTarget target, RenderStates states)

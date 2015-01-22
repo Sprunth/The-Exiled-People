@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SFML.Window;
 
 namespace The_Exiled_People.TileContents
 {
@@ -16,5 +17,5 @@ namespace The_Exiled_People.TileContents
         }
     }
 
-    public enum FloorType { Dirt }
+    public enum FloorType { Grass, Dirt, Stone, Water }
 }
