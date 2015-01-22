@@ -36,6 +36,7 @@ namespace The_Exiled_People
             Win = new RenderWindow(new VideoMode(screensize.X, screensize.Y), "The Exiled People", Styles.Close, cs);
             Win.SetFramerateLimit(60);
             Win.SetVerticalSyncEnabled(true);
+            Win.SetKeyRepeatEnabled(true);
 
             Win.Closed += WinClosed;
             Win.KeyReleased += Win_KeyReleased;

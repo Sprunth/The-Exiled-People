@@ -110,7 +110,7 @@ namespace The_Exiled_People
                     var tc4 = tc1 + new Vector2f(0, Tileset.TileSize.Y);
                     */
 
-                    var tup = Tileset.GetTexCoordOf(_layer[row + TopLeft.X, col + TopLeft.Y].FloorType);
+                    var tup = Tileset.GetTexCoordOf(_layer[col + TopLeft.X, row + TopLeft.Y].FloorType);
                     var tc1 = tup.Item1;
                     var tc2 = tup.Item2;
                     var tc3 = tup.Item3;
@@ -135,7 +135,7 @@ namespace The_Exiled_People
 
         public MapSpot GetSpotAt(uint x, uint y)
         {
-            return _layer[y, x];
+            return _layer[x,y];
         }
 
         void Drawable.Draw(RenderTarget target, RenderStates states)

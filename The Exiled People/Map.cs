@@ -44,6 +44,7 @@ namespace The_Exiled_People
             AddNewLayer(); // Add inital layer
             Program.ActiveGame.Win.MouseButtonReleased += Win_MouseButtonReleased;
             Program.ActiveGame.Win.KeyReleased += Win_KeyReleased;
+            Program.ActiveGame.Win.KeyPressed += Win_KeyPressed;
         }
 
         public void ChangeTileSet(TileSet ts)
@@ -143,6 +144,13 @@ namespace The_Exiled_People
                 case Keyboard.Key.E:
                     MoveUpDownLayer(true);
                     break;
+            }
+        }
+
+        void Win_KeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Code)
+            {
                 case Keyboard.Key.Left:
                 case Keyboard.Key.Right:
                 case Keyboard.Key.Up:
