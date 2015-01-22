@@ -19,13 +19,13 @@ namespace The_Exiled_People
 
         public Vector2u DrawTargetSize { get; set; }
 
-        private TileSet _tileSet;
-        public TileSet Tileset
+        private TileSet _floorTileSet;
+        public TileSet FloorTileSet
         {
-            get { return _tileSet; }
+            get { return _floorTileSet; }
             set
             {
-                _tileSet = value;
+                _floorTileSet = value;
                 SetupVertexArray();
             }
         }
@@ -52,7 +52,7 @@ namespace The_Exiled_People
                 }
             }
 
-            Tileset = initalTileSet;
+            FloorTileSet = initalTileSet;
 
             _topLeft = new Vector2i(0, 0);
 
@@ -66,7 +66,7 @@ namespace The_Exiled_People
             //_vertices.Resize(_layerSize.X * _layerSize.Y * 4);
 
             
-            var tilesize = Tileset.TileSize;
+            var tilesize = FloorTileSet.TileSize;
 
             for (var row = 0; row < _layerSize.X; row++)
             {
@@ -95,22 +95,22 @@ namespace The_Exiled_People
         /// </summary>
         void UpdateTexCoords()
         {
-            //for (var col = (uint)TopLeft.Y; col < DrawTargetSize.X/Tileset.TileSize.X; col++)
-            for (var col = (uint)0; col < DrawTargetSize.X / Tileset.TileSize.X; col++)
+            //for (var col = (uint)TopLeft.Y; col < DrawTargetSize.X/FloorTileSet.TileSize.X; col++)
+            for (var col = (uint)0; col < DrawTargetSize.X / FloorTileSet.TileSize.X; col++)
             {
-                for (var row = (uint)0; row < DrawTargetSize.Y/Tileset.TileSize.Y; row++)
+                for (var row = (uint)0; row < DrawTargetSize.Y/FloorTileSet.TileSize.Y; row++)
                 {
                     /*
                     var tc1 = new Vector2f(
-                        rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.X,
-                        rand.Next((int)Math.Round(((double)Tileset.Tex.Size.X/Tileset.TileSize.X) - 1)) * Tileset.TileSize.Y
+                        rand.Next((int)Math.Round(((double)FloorTileSet.Tex.Size.X/FloorTileSet.TileSize.X) - 1)) * FloorTileSet.TileSize.X,
+                        rand.Next((int)Math.Round(((double)FloorTileSet.Tex.Size.X/FloorTileSet.TileSize.X) - 1)) * FloorTileSet.TileSize.Y
                         );
-                    var tc2 = tc1 + new Vector2f(Tileset.TileSize.X, 0);
-                    var tc3 = tc1 + new Vector2f(Tileset.TileSize.X, Tileset.TileSize.Y);
-                    var tc4 = tc1 + new Vector2f(0, Tileset.TileSize.Y);
+                    var tc2 = tc1 + new Vector2f(FloorTileSet.TileSize.X, 0);
+                    var tc3 = tc1 + new Vector2f(FloorTileSet.TileSize.X, FloorTileSet.TileSize.Y);
+                    var tc4 = tc1 + new Vector2f(0, FloorTileSet.TileSize.Y);
                     */
 
-                    var tup = Tileset.GetTexCoordOf(_layer[col + TopLeft.X, row + TopLeft.Y].FloorType);
+                    var tup = FloorTileSet.GetTexCoordOf(_layer[col + TopLeft.X, row + TopLeft.Y].FloorType);
                     var tc1 = tup.Item1;
                     var tc2 = tup.Item2;
                     var tc3 = tup.Item3;
@@ -140,7 +140,7 @@ namespace The_Exiled_People
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
         {
-            target.Draw(_vertices, new RenderStates(Tileset.Tex));
+            target.Draw(_vertices, new RenderStates(FloorTileSet.Tex));
         }
 
         public void Update()
