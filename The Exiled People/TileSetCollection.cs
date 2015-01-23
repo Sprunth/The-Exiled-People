@@ -19,9 +19,15 @@ namespace The_Exiled_People
         private readonly Dictionary<FloorType, Vector2f> _floorTilePositions;
         private readonly Dictionary<PersonProfession, Vector2f> _peopleTilePositions;
 
+        public Dictionary<PersonProfession, Tuple<Vector2f, Vector2f, Vector2f, Vector2f>> _professionTexCoords;
+        public Dictionary<FloorType, Tuple<Vector2f, Vector2f, Vector2f, Vector2f>> _floorTexCoords; 
+
         public TileSetCollection()
         {
             TileSize = new Vector2u(16, 16);
+
+            _professionTexCoords = new Dictionary<PersonProfession, Tuple<Vector2f, Vector2f, Vector2f, Vector2f>>();
+            _floorTexCoords = new Dictionary<FloorType, Tuple<Vector2f, Vector2f, Vector2f, Vector2f>>();
 
             Floor = new TileSet("Graphics/Floor.png");
             // hardcoded for now, load by file in future
@@ -41,9 +47,21 @@ namespace The_Exiled_People
                 {PersonProfession.CoffeeMan, new Vector2f(1, 3)},
                 {PersonProfession.Guard, new Vector2f(3, 3)}
             };
+
+            RecalculateTexCoords();
         }
 
-        public Tuple<Vector2f, Vector2f, Vector2f, Vector2f> GetTexCoordOf(FloorType ft)
+        private void RecalculateTexCoords()
+        {
+            var floorValues = Enum.GetValues(typeof(FloorType));
+            foreach (FloorType fv in floorValues)
+                _floorTexCoords[fv] = CalculateTexCoords(fv);
+            var professionValues = Enum.GetValues(typeof(PersonProfession));
+            foreach (PersonProfession pv in professionValues)
+                _professionTexCoords[pv] = CalculateTexCoords(pv);
+        }
+
+        private Tuple<Vector2f, Vector2f, Vector2f, Vector2f> CalculateTexCoords(FloorType ft)
         {
             var p1 = _floorTilePositions[ft];
             p1.X *= TileSize.X;
@@ -54,7 +72,7 @@ namespace The_Exiled_People
             return new Tuple<Vector2f, Vector2f, Vector2f, Vector2f>(p1, p2, p3, p4);
         }
 
-        public Tuple<Vector2f, Vector2f, Vector2f, Vector2f> GetTexCoordOf(PersonProfession pp)
+        private Tuple<Vector2f, Vector2f, Vector2f, Vector2f> CalculateTexCoords(PersonProfession pp)
         {
             var p1 = _peopleTilePositions[pp];
             p1.X *= TileSize.X;
@@ -63,6 +81,15 @@ namespace The_Exiled_People
             var p3 = p1 + new Vector2f(TileSize.X, TileSize.Y);
             var p4 = p1 + new Vector2f(0, TileSize.Y);
             return new Tuple<Vector2f, Vector2f, Vector2f, Vector2f>(p1, p2, p3, p4);
+        }
+
+        public Tuple<Vector2f, Vector2f, Vector2f, Vector2f> GetTexCoordOf(FloorType ft)
+        {
+            return _floorTexCoords[ft];
+        }
+        public Tuple<Vector2f, Vector2f, Vector2f, Vector2f> GetTexCoordOf(PersonProfession pp)
+        {
+            return _professionTexCoords[pp];
         }
     }
 }

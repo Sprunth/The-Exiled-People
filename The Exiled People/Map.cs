@@ -28,12 +28,12 @@ namespace The_Exiled_People
 
         private bool zoomed = false;
 
-        public Map(Vector2u layerSize, Vector2u displaySize)
+        public Map(Vector2u layerSize, Vector2u displaySize, Vector2f position)
         {
             _layerSize = layerSize;
 
             _target = new RenderTexture(displaySize.X, displaySize.Y) {Smooth = true};
-            _targetSpr = new Sprite() {Position = new Vector2f(12, 24)};
+            _targetSpr = new Sprite() {Position = position};
 
             _tileSetCollection = new TileSetCollection();
 
@@ -135,6 +135,7 @@ namespace The_Exiled_People
             mapCoords.Y += (uint)_entireMap[_activeLayer].TopLeft.Y;
             if (zoomed)
             {
+                //buggy
                 mapCoords.X *= 2;
                 mapCoords.Y *= 2;
             }
