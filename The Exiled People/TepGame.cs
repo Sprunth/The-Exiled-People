@@ -67,7 +67,7 @@ namespace The_Exiled_People
                 // Not super accurate, espcially if frame is working too fast
                 var fps = (int)Math.Round(1 / (DateTime.Now - frameStart).TotalSeconds);
                 if (fps == lastFPS) { continue; }
-                Win.SetTitle(string.Format("The Exiled People | FPS: {0}", fps));
+                Win.SetTitle(string.Format("The Exiled People | FPS: {0} | Memory: {1}", fps, GC.GetTotalMemory(false)));
                 lastFPS = fps;
             }
         }
@@ -75,6 +75,7 @@ namespace The_Exiled_People
         void Update()
         {
             Win.DispatchEvents();
+            
         }
 
         void Draw()
