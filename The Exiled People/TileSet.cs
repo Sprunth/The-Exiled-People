@@ -11,7 +11,6 @@ namespace The_Exiled_People
 {
     /// <summary>
     /// Contains all the data for a particular texture map
-    /// TODO: make dictionaries more flexible instead of taking a specific enum
     /// </summary>
     class TileSet
     {

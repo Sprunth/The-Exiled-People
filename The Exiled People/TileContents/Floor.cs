@@ -17,5 +17,5 @@ namespace The_Exiled_People.TileContents
         }
     }
 
-    public enum FloorType { Grass, Dirt, Stone, Water }
+    public enum FloorType { Grass, Dirt, Stone, Water, Sky, SmoothedStone }
 }

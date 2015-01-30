@@ -24,7 +24,7 @@ namespace The_Exiled_People
 
         public override string ToString()
         {
-            return _floor.Type.ToString();
+            return string.Format("{0} {1}", _floor.Type, _person.Type);
         }
     }
 }

@@ -36,7 +36,9 @@ namespace The_Exiled_People
                 {FloorType.Grass, new Vector2f(0, 0)},
                 {FloorType.Dirt, new Vector2f(0, 1)},
                 {FloorType.Stone, new Vector2f(1, 0)},
-                {FloorType.Water, new Vector2f(1, 1)}
+                {FloorType.Water, new Vector2f(1, 1)},
+                {FloorType.Sky, new Vector2f(0, 2)},
+                {FloorType.SmoothedStone, new Vector2f(1, 2)}
             };
             People = new TileSet("Graphics/People.png");
             _peopleTilePositions = new Dictionary<PersonProfession, Vector2f>()

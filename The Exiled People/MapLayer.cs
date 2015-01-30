@@ -14,6 +14,16 @@ namespace The_Exiled_People
     {
         private readonly MapSpot[,] _layer;
         private readonly VertexArray _floorVertices, _peopleVertices;
+        public MapSpot this[int x, int y]
+        {
+            get { return _layer[x, y]; }
+            set {
+                _layer[x, y] = value;
+                dirtyTexCoords = true;
+            }
+        }
+        private bool dirtyTexCoords = false;
+
         /// <summary>
         /// Holds a tuple containing the 4 corner positions of each grid position
         /// </summary>
@@ -49,6 +59,7 @@ namespace The_Exiled_People
             _drawTargetSize = initalDrawTargetSize;
 
             _layer = new MapSpot[_layerSize.X, _layerSize.Y];
+            
             var floorTypes = Enum.GetValues(typeof (FloorType));
             var professions = Enum.GetValues(typeof (PersonProfession));
             for (var row = 0; row < _layerSize.Y; row++)
@@ -61,7 +72,7 @@ namespace The_Exiled_People
                     _layer[row, col] = new MapSpot(floor, profession);
                 }
             }
-
+            
             _topLeft = new Vector2i(0, 0);
 
             _tileSetCollection = initalTileSetCollection;
@@ -143,6 +154,11 @@ namespace The_Exiled_People
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
         {
+            if (dirtyTexCoords)
+            {
+                dirtyTexCoords = false;
+                UpdateTexCoords();
+            }
             target.Draw(_floorVertices, new RenderStates(TileSetCollection.Floor.Tex));
             target.Draw(_peopleVertices, new RenderStates(TileSetCollection.People.Tex));
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +49,8 @@ namespace The_Exiled_People
             _targetSpr = new Sprite();
 
             _map = new Map(new Vector2u(90, 90), new Vector2u(960, 884), new Vector2f(8, 16));
+            // Mini test map
+            //_map = new Map(new Vector2u(4, 4), new Vector2u(64, 64), new Vector2f(8, 16));
         }
 
         public void Initialize()
@@ -57,6 +61,7 @@ namespace The_Exiled_People
         public void Run()
         {
             var lastFPS = 0;
+
             while (Win.IsOpen())
             {
                 var frameStart = DateTime.Now;
@@ -67,7 +72,7 @@ namespace The_Exiled_People
                 // Not super accurate, espcially if frame is working too fast
                 var fps = (int)Math.Round(1 / (DateTime.Now - frameStart).TotalSeconds);
                 if (fps == lastFPS) { continue; }
-                Win.SetTitle(string.Format("The Exiled People | FPS: {0} | Memory: {1}", fps, GC.GetTotalMemory(false)));
+                Win.SetTitle(string.Format("The Exiled People | FPS: {0} | Memory: {1} MB", fps, Process.GetCurrentProcess().VirtualMemorySize64/1000000));
                 lastFPS = fps;
             }
         }
@@ -98,8 +103,8 @@ namespace The_Exiled_People
 
         void WinClosed(object sender, EventArgs e)
         {
-            if (sender.GetType() == typeof(RenderWindow))
-                ((RenderWindow)sender).Close();
+            if (sender == Win)
+                Win.Close();
         }
 
         void IDisposable.Dispose()
@@ -108,5 +113,6 @@ namespace The_Exiled_People
             _targetSpr.Dispose();
             Win.Dispose();
         }
+
     }
 }
